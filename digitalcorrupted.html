@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigitalCorrupted - Oficial</title>
+    <!-- Biblioteca JSZip para ler arquivos .zip direto no navegador -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        /* --- ESTILOS GERAIS (CIRCO CORROMPIDO) --- */
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #05050a;
+            color: #ff3333;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .tela {
+            display: none;
+        }
+
+        /* --- TELA 1: LOGIN --- */
+        .login-box {
+            background-color: #0d0d14;
+            padding: 40px;
+            border-radius: 10px;
+            border: 2px solid #ff3333;
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
+            text-align: center;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px #ff3333;
+        }
+
+        .subtitulo {
+            color: #666688;
+            font-size: 12px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #00ffcc;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background-color: #12121f;
+            border: 1px solid #333355;
+            color: #ffffff;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00ffcc;
+        }
+
+        .btn-principal {
+            background-color: #ff3333;
+            color: #ffffff;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-principal:hover {
+            background-color: #cc0000;
+            box-shadow: 0 0 15px #ff3333;
+        }
+
+        /* --- TELA 2: CHAT SECRETO --- */
+        .chat-container {
+            background-color: #000000;
+            border: 2px dashed #00ffcc;
+            padding: 20px;
+            border-radius: 8px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            border-bottom: 2px dashed #00ffcc;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .chat-mensagens {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .msg {
+            max-width: 70%;
+            padding: 12px;
+            border-radius: 8px;
+            line-height: 1.4;
+        }
+
+        .msg.caine {
+            background-color: #220000;
+            border: 1px solid #ff3333;
+            color: #ff6666;
+            align-self: flex-start;
+        }
+
+        .msg.abel {
+            background-color: #002222;
+            border: 1px solid #00ffcc;
+            color: #66ffeb;
+            align-self: flex-end;
+        }
+
+        .nome-chat {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .btn-escape {
+            background-color: transparent;
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
+            padding: 10px;
+            cursor: pointer;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        .btn-escape:hover {
+            background-color: #00ffcc;
+            color: #000000;
+        }
+
+        /* --- TELA 3: VITRINE DE JOGOS --- */
+        .jogos-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .jogos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .jogo-card {
+            background-color: #0d0d14;
+            border: 1px solid #333355;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .jogo-card h3 {
+            margin: 0 0 10px 0;
+            color: #ffffff;
+        }
+
+        .btn-download-custom, .btn-jogar-custom {
+            display: block;
+            text-align: center;
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        .btn-download-custom {
+            background: linear-gradient(45deg, #ff0055, #990033);
+            border: 1px solid #ff3333;
+        }
+
+        .btn-jogar-custom {
+            background: linear-gradient(45deg, #00ffcc, #009977);
+            border: 1px solid #00ffcc;
+            color: #05050a;
+        }
+
+        /* --- TELA 4: SALA DE CONTROLE (ADMIN) --- */
+        .sala-controle {
+            background-color: #101018;
+            border: 3px double #00ffcc;
+            border-radius: 12px;
+            padding: 30px;
+        }
+
+        .monitor-central {
+            background-color: #05050a;
+            border: 2px solid #333355;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .olhos-caine {
+            font-size: 24px;
+            color: #ff3333;
+            text-shadow: 0 0 8px #ff3333;
+        }
+
+        /* --- CONTAINER DO JOGO (POP-UP / TELA CHEIA) --- */
+        #containerJogoWeb {
+            display: none;
+            background-color: #101018;
+            border: 3px solid #00ffcc;
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        /* Estilo Modo Janela Pop-up */
+        .modo-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 600px;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.5);
+            border-radius: 8px;
+        }
+
+        /* Estilo Modo Tela Cheia */
+        .modo-telacheia {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .barra-jogo {
+            background-color: #05050a;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #00ffcc;
+        }
+
+        .titulo-jogo-barra {
+            color: #00ffcc;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .botoes-barra button {
+            background: none;
+            border: 1px solid #00ffcc;
+            color: #00ffcc;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        .botoes-barra button:hover {
+            background-color: #00ffcc;
+            color: #05050a;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: #000;
+        }
+
+        .efeito-bug {
+            animation: tremer 0.1s infinite;
+        }
+        @keyframes tremer {
+            0% { transform: translate(1px, 1px); }
+            100% { transform: translate(-1px, -2px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ================= TELA 1: LOGIN ================= -->
+        <section id="telaLogin" class="tela" style="display: block;">
+            <div class="login-box" id="boxLogin">
+                <h1>DIGITAL_CORRUPTED</h1>
+                <div class="subtitulo">SISTEMA DE ACESSO AO CIRCO v0.7.0</div>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label for="usuario">NOME DA CONTA:</label>
+                        <input type="text" id="usuario" required placeholder="Digite o usuário...">
+                    </div>
+                    <div class="input-group">
+                        <label for="senha">SENHA DE ACESSO:</label>
+                        <input type="password" id="senha" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn-principal">ENTRAR NO SISTEMA</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ================= TELA 2: CHAT SECRETO ================= -->
+        <section id="telaChat" class="tela">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h2>👁️ CONVERSA_INTERCEPTADA_#001</h2>
+                </div>
+                <div class="chat-mensagens">
+                    <div class="msg caine"><span class="nome-chat">Caine 🪞</span>Abel... as coisas estão saindo do controle. A Pomni é a única que resta inteira.</div>
+                    <div class="msg abel"><span class="nome-chat">Abel ⏳</span>Eu te avisei, Caine. O código deles não aguenta a eternidade.</div>
+                </div>
+                <button class="btn-escape" onclick="mudarTela('telaLogin')">❌ ESCAPAR</button>
+            </div>
+        </section>
+
+        <!-- ================= TELA 3: VITRINE DE JOGOS ================= -->
+        <section id="telaJogos" class="tela">
+            <div class="jogos-header">
+                <h1>🕹️ DIGITAL_CORRUPTED - ACERVO</h1>
+                <button class="btn-escape" onclick="mudarTela('telaLogin')">⬅️ SAIR</button>
+            </div>
+            <div class="jogos-grid" id="vitrineJogos"></div>
+        </section>
+
+        <!-- ================= TELA 4: SALA DE CONTROLE (ADMIN) ================= -->
+        <section id="telaAdmin" class="tela">
+            <div class="sala-controle">
+                <div class="monitor-central">
+                    <div class="olhos-caine">👁️ 👁️</div>
+                    <div>[ MONITOR CENTRAL - CAINE ASSISTINDO ]</div>
+                </div>
+                <form id="publicarForm">
+                    <div class="input-group">
+                        <label for="jogoTitulo">NOME DO JOGO:</label>
+                        <input type="text" id="jogoTitulo" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="jogoDescricao">DESCRIÇÃO:</label>
+                        <input type="text" id="jogoDescricao" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="tipoFuncionamento">TIPO DE SCRIPT:</label>
+                        <select id="tipoFuncionamento">
+                            <option value="download">Apenas Download (.exe, .apk, .zip)</option>
+                            <option value="web">Rodar no Navegador (Requer .zip com index.html)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="jogoArquivo">ARQUIVO DO JOGO:</label>
+                        <input type="file" id="jogoArquivo" required>
+                    </div>
+                    <button type="submit" class="btn-admin" style="background-color: #00ffcc; padding: 10px; width: 100%; font-weight: bold; border: none; cursor: pointer;">💾 INJETAR ARQUIVO</button>
+                </form>
+                <button class="btn-escape" onclick="mudarTela('telaLogin')" style="margin-top: 20px; width: 100%;">🚪 DESLIGAR</button>
+            </div>
+        </section>
+
+        <!-- ================= REPRODUTOR DE JOGO WEB (IFRAME) ================= -->
+        <div id="containerJogoWeb" class="modo-popup">
+            <div class="barra-jogo">
+                <span class="titulo-jogo-barra" id="nomeJogoExecucao">Executando_Codigo...</span>
+                <div class="botoes-barra">
+                    <button id="btnAlternarTela" onclick="alternarTamanhoJogo()">🔲 Alternar Tela</button>
+                    <button onclick="fecharJogoWeb()">❌ Fechar</button>
+                </div>
+            </div>
+            <iframe id="leitorIframe"></iframe>
+        </div>
+
+    </div>
+
+    <script>
+        // Banco de dados em memória temporária para guardar os arquivos convertidos em Blobs
+        let arquivosBlobCache = {};
+
+        function mudarTela(idTelaDestino) {
+            document.getElementById('telaLogin').style.display = 'none';
+            document.getElementById('telaChat').style.display = 'none';
+            document.getElementById('telaJogos').style.display = 'none';
+            document.getElementById('telaAdmin').style.display = 'none';
+
+            if(idTelaDestino === 'telaChat') {
+                document.getElementById(idTelaDestino).style.display = 'flex';
+            } else {
+                document.getElementById(idTelaDestino).style.display = 'block';
+            }
+
+            if (idTelaDestino === 'telaJogos') {
+                carregarJogosVitrine();
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const usuario = document.getElementById('usuario').value.trim().toLowerCase();
+            const senha = document.getElementById('senha').value.trim();
+
+            if (usuario === 'caine' && senha === '123') {
+                const box = document.getElementById('boxLogin');
+                box.classList.add('efeito-bug');
+                setTimeout(() => {
+                    box.classList.remove('efeito-bug');
+                    mudarTela('telaChat');
+                }, 1000);
+            } 
+            else if (usuario === 'user' && senha === '12345678910') {
+                mudarTela('telaAdmin');
+            } 
+            else {
+                mudarTela('telaJogos');
+            }
+            document.getElementById('usuario').value = '';
+            document.getElementById('senha').value = '';
+        });
+
+        // Evento de Publicação de Jogos
+        document.getElementById('publicarForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const titulo = document.getElementById('jogoTitulo').value;
+            const descricao = document.getElementById('jogoDescricao').value;
+            const tipo = document.getElementById('tipoFuncionamento').value;
+            const arquivoInput = document.getElementById('jogoArquivo').files[0];
+
+            if (!arquivoInput) return;
+
+            const idUnico = 'jogo_' + Date.now();
+            
+            // Guarda o arquivo original como um link Blob na memória local
+            arquivosBlobCache[idUnico] = archivoInput;
+
+            let lista = JSON.parse(localStorage.getItem('jogosCirco')) || [];
+            lista.push({
+                id: idUnico,
+                titulo: titulo,
+                descricao: descricao,
+                tipo: tipo,
+                nomeArquivo: arquivoInput.name
+            });
+            localStorage.setItem('jogosCirco', JSON.stringify(lista));
+
+            alert('Arquivo injetado com sucesso!');
+            document.getElementById('publicarForm').reset();
+        });
+
+        function carregarJogosVitrine() {
+            const vitrine = document.getElementById('vitrineJogos');
+            const lista = JSON.parse(localStorage.getItem('jogosCirco')) || [];
+
+            vitrine.innerHTML = '';
+
+            lista.forEach(jogo => {
+                const card = document.createElement('div');
+                card.className = 'jogo-card';
+                
+                let botaoAcao = '';
+                
+                if (jogo.tipo === 'web') {
+                    botaoAcao = `<button class="btn-jogar-custom" onclick="inicializarJogoWeb('${jogo.id}')">🎮 Rodar no Navegador</button>`;
+                } else {
+                    botaoAcao = `<button class="btn-download-custom" onclick="baixarArquivoJogo('${jogo.id}')">📥 Baixar Arquivo</button>`;
+                }
+
+                card.innerHTML = `
+                    <div>
+                        <h3>${jogo.titulo}</h3>
+                        <p style="color: #a8a8b3; font-size: 14px;">${jogo.descricao}</p>
+                    </div>
+                    ${botaoAcao}
+                `;
+                vitrine.appendChild(card);
+            });
+        }
+
+        function baixarArquivoJogo(id) {
+            const arquivo = arquivosBlobCache[id];
+            if (!arquivo) {
+                alert("Erro: O arquivo não está mais na memória desta sessão.");
+                return;
+            }
+            const url = URL.createObjectURL(arquivo);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = arquivo.name;
+            a.click();
+        }
+
+        // Função para abrir o arquivo .zip e rodar o index.html dentro do iframe
+        function inicializarJogoWeb(id) {
+            const arquivo = arquivosBlobCache[id];
+            if (!arquivo) {
+                alert("Erro: Arquivo indisponível.");
+                return;
+            }
+
+            document.getElementById('nomeJogoExecucao').innerText = arquivo.name;
+            
+            // Usando JSZip para ler os arquivos compactados
+            JSZip.loadAsync(arquivo).then(function(zip) {
+                // Procura pelo arquivo index.html principal dentro da pasta comprimida
+                const arquivoIndex = zip.file("index.html");
+                
+                if (!arquivoIndex) {
+                    alert("Erro crítico: Nenhum arquivo 'index.html' foi localizado dentro do .zip.");
+                    return;
+                }
+
+                arquivoIndex.async("string").then(function(conteudoHtml) {
+                    const iframe = document.getElementById('leitorIframe');
+                    
+                    // Configura o visualizador para o estado padrão de Pop-up
+                    const container = document.getElementById('containerJogoWeb');
+                    container.className = 'modo-popup';
+                    container.style.display = 'flex';
+
+                    // Injeta o código HTML extraído diretamente no iframe do site
+                    iframe.srcdoc = conteudoHtml;
+                });
+            }).catch(function(err) {
+                alert("Erro ao ler a estrutura do arquivo .zip: " + err.message);
+            });
+        }
+
+        function alternarTamanhoJogo() {
+            const container = document.getElementById('containerJogoWeb');
+            if (container.className === 'modo-popup') {
+                container.className = 'modo-telacheia';
+            } else {
+                container.className = 'modo-popup';
+            }
+        }
+
+        function fecharJogoWeb() {
+            const container = document.getElementById('containerJogoWeb');
+            const iframe = document.getElementById('leitorIframe');
+            container.style.display = 'none';
+            iframe.srcdoc = ''; // Desliga o jogo limpando o iframe
+        }
+    </script>
+</body>
+</html>
